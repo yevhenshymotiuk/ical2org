@@ -70,7 +70,7 @@ BEGIN {
     # maximum age in days for entries to be output: set this to -1 to
     # get all entries or to N>0 to only get enties that start or end
     # less than N days ago
-    max_age = 7;
+    max_age = 10;
 
     # set to 1 or 0 to yes or not output a header block with TITLE,
     # AUTHOR, EMAIL etc...
@@ -78,7 +78,7 @@ BEGIN {
 
     # set to 1 or 0 to yes or not output the original ical preamble as
     # comment
-    preamble = 1;
+    preamble = 0;
 
     # set to 1 to output time and summary as one line starting with
     # the time (value 1) or to 0 to output the summary as first line
@@ -88,7 +88,7 @@ BEGIN {
 
     # set to 1 or 0 to yes or not output the original ical entry as a
     # comment (mostly useful for debugging purposes)
-    original = 1;
+    original = 0;
 
     # google truncates long subjects with ... which is misleading in
     # an org file: it gives the unfortunate impression that an
@@ -125,7 +125,7 @@ BEGIN {
     max_age_seconds = max_age*24*60*60
 
     if (header) {
-        print "#+TITLE:       Main Google calendar entries"
+        print "#+TITLE:       Main calendar entries"
         print "#+AUTHOR:     ", author
         print "#+EMAIL:      ", emailaddress
         print "#+DESCRIPTION: converted using the ical2org awk script"
@@ -384,34 +384,29 @@ BEGIN {
                 print "* <" date "> " gensub("^[ ]+", "", "", unescape(summary, 0))
             else
                 print "* " gensub("^[ ]+", "", "g", unescape(summary, 0))
-            print "  :PROPERTIES:"
-            print     "  :ID:        " id
+            print ":PROPERTIES:"
+            print ":ID:        " id
             if(length(location))
-                print "  :LOCATION:  " location
+                print ":LOCATION:  " location
             if(length(status))
-                print "  :STATUS:    " status
+                print ":STATUS:    " status
             attending_string = attending_types[attending]
-            if(attending_string == "UNSET")
-                # No attending info at all -- assume this is an event we
-                # created to block off our calendar, with no attendees, and
-                # mark it as attending
-                attending_string = "ATTENDING"
-            print "  :ATTENDING: " attending_string
-            print "  :ATTENDEES: " join_keys(people_attending)
-            print "  :END:"
+            print ":ATTENDING: " attending_string
+            print ":ATTENDEES: " join_keys(people_attending)
+            print ":END:"
             if (date2 != "")
             {
                 # Fake some logbook entries so we can generate a clock report
-                print "  :LOGBOOK:"
-                print "  CLOCK: [" date1 "]--[" date2 "] =>  " "0:00"
-                print "  :END"
+                print ":LOGBOOK:"
+                print ":CLOCK: [" date1 "]--[" date2 "] =>  " "0:00"
+                print ":END:"
             }
-            if (!condense)
-                 print "<" date ">"
-
             print ""
+            if (!condense)
+                 print "<" date ">\n"
+
             if(length(entry)>1)
-                print gensub("^[ ]+", "", "g", unescape(entry, 1));
+                print gensub("^[ ]+", "", "g", unescape(entry, 1)) "\n"
 
             # output original entry if requested by 'original' config option
             if (original)
