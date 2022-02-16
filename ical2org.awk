@@ -70,7 +70,7 @@ BEGIN {
     # maximum age in days for entries to be output: set this to -1 to
     # get all entries or to N>0 to only get enties that start or end
     # less than N days ago
-    max_age = 10;
+    max_age = ENVIRON["MAX_AGE"] != "" ? ENVIRON["MAX_AGE"] : -1;
 
     # set to 1 or 0 to yes or not output a header block with TITLE,
     # AUTHOR, EMAIL etc...
